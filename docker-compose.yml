@@ -1,16 +1,16 @@
-version: '3.1'
+version: '3.4'
 
 networks:
   docker:
 
 volumes:
   jenkins-data:
-  jenkins-docker-certs:
-  
+  docker-certs:
+  docker-certs-ca:
 services:
 
   jenkins:
-    image: jenkinsci/blueocean
+    image: jenkins/jenkins:lts-jdk11
     restart: unless-stopped
     networks:
       - docker
@@ -20,10 +20,10 @@ services:
     tty: true
     volumes:
       - jenkins-data:/var/jenkins_home
-      - jenkins-docker-certs:/certs/client:ro
-      - $HOME:/home
+      - docker-certs:/certs/client:ro
+      - /usr/bin/docker:/usr/bin/docker
     environment:
-      - DOCKER_HOST="tcp://docker:2376"
+      - DOCKER_HOST=tcp://docker:2376
       - DOCKER_CERT_PATH=/certs/client
       - DOCKER_TLS_VERIFY=1
         
@@ -35,12 +35,10 @@ services:
       docker:
         aliases:
           - docker
-    ports:
-      - 2376:2376
     tty: true
     volumes:
       - jenkins-data:/var/jenkins_home
-      - jenkins-docker-certs:/certs/client
-      - $HOME:/home
+      - docker-certs:/certs/client
+      - docker-certs-ca:/certs/ca
     environment:
       - DOCKER_TLS_CERTDIR=/certs
